@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -196,14 +197,44 @@ namespace GitHub.Runner.Listener
                 var base64JitConfig = command.GetJitConfig();
                 if (!string.IsNullOrEmpty(base64JitConfig))
                 {
+                    // var dict = new Dictionary<string, string>();
                     var decodedJitConfig = Encoding.UTF8.GetString(Convert.FromBase64String(base64JitConfig));
                     var jitConfig = StringUtil.ConvertFromJson<Dictionary<string, string>>(decodedJitConfig);
                     foreach (var config in jitConfig)
                     {
                         var configFile = Path.Combine(HostContext.GetDirectory(WellKnownDirectory.Root), config.Key);
                         var configContent = Encoding.UTF8.GetString(Convert.FromBase64String(config.Value));
+                        // dict[config.Key] = configContent;
                         File.WriteAllText(configFile, configContent, Encoding.UTF8);
+                    // }
+
+                    // var json = StringUtil.ConvertToJson(dict, Newtonsoft.Json.Formatting.None);
+                    // string base64 = null;
+                    // using (var result = new MemoryStream())
+                    // {
+                    //     using (var compressionStream = new GZipStream(result, CompressionMode.Compress))
+                    //     {
+                    //         await compressionStream.WriteAsync(Encoding.UTF8.GetBytes(json));
+                    //         await compressionStream.FlushAsync();
+                    //     }
+
+                    //     base64 = Convert.ToBase64String(result.ToArray());
+                    //     Trace.Info(base64);
+                    // }
+
+                    // using (var result = new MemoryStream())
+                    // {
+                    //     using (var source = new MemoryStream(Convert.FromBase64String(base64)))
+                    //     using (var decompressionStream = new GZipStream(source, CompressionMode.Decompress))
+                    //     {
+                    //         await decompressionStream.CopyToAsync(result);
+                    //     }
+
+                    //     var decompressed = Convert.ToBase64String(result.ToArray());
+                    //     Trace.Info(decompressed);
                     }
+
+                    // return Constants.Runner.ReturnCode.Success;
                 }
 
                 RunnerSettings settings = configManager.LoadSettings();
